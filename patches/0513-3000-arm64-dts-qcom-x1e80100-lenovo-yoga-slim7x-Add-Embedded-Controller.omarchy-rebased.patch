@@ -1,0 +1,59 @@
+From 3498bf9a64c2959cc14ec9e8679cedf50222a0c7 Mon Sep 17 00:00:00 2001
+From: Daniel J Blueman <daniel@quora.org>
+Date: Sun, 12 Jul 2026 21:45:56 +0800
+Subject: [PATCH] arm64: dts: qcom: x1e80100-lenovo-yoga-slim7x: Add Embedded
+ Controller node
+
+The Lenovo Slim7x uses the same Embedded Controller as the Qualcomm Hamoa
+X1 Customer Reference Device. Use the lenovo,yoga-slim7x-ec compatible
+for fan control, thermal sensor and suspend behaviour.
+
+Reviewed-by: Bryan O'Donoghue <bryan.odonoghue@linaro.org>
+Reviewed-by: Sibi Sankar <sibi.sankar@oss.qualcomm.com>
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Signed-off-by: Daniel J Blueman <daniel@quora.org>
+Link: https://patch.msgid.link/20260712134601.99191-2-daniel@quora.org
+Signed-off-by: Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
+
+[omarchy-slim7x: context rebased onto Omarchy 7.3 camera nodes]
+---
+ arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+
+--- a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
++++ b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+@@ -1078,6 +1078,22 @@
+ 	};
+ };
+ 
++&i2c5 {
++	clock-frequency = <400000>;
++
++	status = "okay";
++
++	embedded-controller@76 {
++		compatible = "lenovo,yoga-slim7x-ec", "qcom,hamoa-crd-ec";
++		reg = <0x76>;
++
++		interrupts-extended = <&tlmm 66 IRQ_TYPE_EDGE_FALLING>;
++
++		pinctrl-0 = <&ec_int_n_default>;
++		pinctrl-names = "default";
++	};
++};
++
+ &i2c7 {
+ 	clock-frequency = <400000>;
+ 
+@@ -1502,6 +1518,12 @@
+ 		bias-disable;
+ 	};
+ 
++	ec_int_n_default: ec-int-n-state {
++		pins = "gpio66";
++		function = "gpio";
++		bias-disable;
++	};
++
+ 	edp_reg_en: edp-reg-en-state {
+ 		pins = "gpio70";
+ 		function = "gpio";

@@ -1,0 +1,41 @@
+From 28b8496ba552aafd3ed50b02fe7ca2478f5f5c0b Mon Sep 17 00:00:00 2001
+From: Anthony Ruhier <aruhier@mailbox.org>
+Date: Thu, 22 Oct 2026 12:34:59 +0200
+Subject: [PATCH] arm64: dts: qcom: x1e80100-lenovo-yoga-slim7x: document GPIO
+ 71
+
+The purpose of the GPIO 71 pin in the x1e80100 Yoga Slim 7x was unknown.
+
+By decoding the Windows DSDT, I saw that it describes it as the
+card-detect GPIO of the SD card controller (SDC2 _CRS: GpioInt (Edge,
+ActiveBoth, SharedAndWake, PullUp) and GpioIo (PullUp) on pin 71).
+
+The Slim 7x has no SD card reader, which could explain why the pin is
+bridged with pin 92.
+
+Rename the pin state from lid-pull-n-pins to sd-cd-n-pins accordingly.
+
+Signed-off-by: Anthony Ruhier <aruhier@mailbox.org>
+---
+ arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+index 558e3fe1f94e..d204be5e8a62 100644
+--- a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
++++ b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+@@ -1555,9 +1555,12 @@
+ 		 * events). By default, pin 71 is set as output-high, which blocks any
+ 		 * event on pin 92. Output-disable on pin 71 is necessary to get events on
+ 		 * pin 92.
+-		 * The purpose of pin 71 is not yet known; lid-pull is a supposition.
++		 * In the ACPI tables, pin 71 is the card-detect GPIO of the SD card
++		 * controller (SDC2), with a pull-up. The Yoga Slim 7x has no
++		 * card reader which might explain why it has been bridged with another
++		 * pin.
+ 		 */
+-		lid-pull-n-pins {
++		sd-cd-n-pins {
+ 			pins = "gpio71";
+ 			function = "gpio";
+ 			bias-pull-up;

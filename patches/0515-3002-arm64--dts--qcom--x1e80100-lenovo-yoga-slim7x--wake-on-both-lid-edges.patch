@@ -1,0 +1,53 @@
+From c7a32f5f3011fbb2d332bbcc592ad3de33b99003 Mon Sep 17 00:00:00 2001
+From: Anthony Ruhier <aruhier@mailbox.org>
+Date: Thu, 22 Oct 2026 01:50:01 +0200
+Subject: [PATCH] arm64: dts: qcom: x1e80100-lenovo-yoga-slim7x: wake on both
+ lid edges
+
+With the lid open, s2idle wakes up after almost exactly 300 s, reported
+as a lid wake (gpio_keys, GPIO 92) although the lid did not move.
+
+While suspended, the firmware leaves AOSD about every 300 s and goes
+straight back, without Linux noticing. EV_ACT_DEASSERTED makes gpio-keys
+switch the lid IRQ to rising edge only at suspend. With the PDC in
+pass-through mode, the line it drives to the GIC is the pin level,
+inverted for falling edge. Whenever that line is high and the pin has a
+single-edge type, the AOSD exit produces a lid interrupt that wakes the
+system. With both edges, the line is just as high with the lid open, but
+no interrupt is produced. So the event comes from the always-on side
+(the PDC or the firmware), not from the GIC.
+
+Measured on a Yoga Slim 7x:
+- rising only, lid open: wakes after 5:02 (AOSD stint 299.1 s)
+- rising only, lid closed: sleeps (15 AOSD stints over 73 min)
+- falling only, lid open: sleeps (9.5 min)
+- falling only, lid closed: wakes after 5:02 with the lid shut
+- both edges, lid open or closed: sleeps, wakes on lid open
+
+Drop wakeup-event-action to keep the lid IRQ on both edges through
+suspend. This matches Windows: the DSDT of this machine arms the lid as
+GpioInt (Edge, ActiveBoth, SharedAndWake) on GPIO 92, and Windows does
+not false-wake in Modern Standby, with the lid open or closed.
+
+Closing the lid of a system suspended with the lid open now wakes it
+too; logind then suspends it again after its lid holdoff.
+
+Fixes: 7069abcd5340 ("arm64: dts: qcom: x1e80100-lenovo-yoga-slim7x: Add lid switch")
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Anthony Ruhier <aruhier@mailbox.org>
+---
+ arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+index 68864a294b2d8..558e3fe1f94e1 100644
+--- a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
++++ b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+@@ -38,7 +38,6 @@
+ 			linux,input-type = <EV_SW>;
+ 			linux,code = <SW_LID>;
+ 			wakeup-source;
+-			wakeup-event-action = <EV_ACT_DEASSERTED>;
+ 		};
+ 	};
+ 
