@@ -3,9 +3,12 @@
 set -euo pipefail
 cd /work
 
-# pacman >= 7 sandboxes downloads with Landlock, which Docker does not allow.
+# pacman >= 7 sandboxes downloads with Landlock and seccomp, which Docker on the runner
+# does not allow. Older versions only warn about the unknown directives.
+for opt in DisableSandbox DisableSandboxFilesystem DisableSandboxSyscalls; do
+  grep -q "^$opt" /etc/pacman.conf || sed -i "/^\[options\]/a $opt" /etc/pacman.conf
+done
 PM=(pacman)
-pacman --help 2>&1 | grep -q -- --disable-sandbox && PM=(pacman --disable-sandbox)
 
 pacman-key --init
 pacman-key --populate archlinuxarm
