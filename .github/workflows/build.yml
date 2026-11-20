@@ -20,11 +20,14 @@ jobs:
 
       - name: Fetch and verify the Arch Linux ARM root filesystem
         run: |
-          base=https://os.archlinuxarm.org/os
+          # os.archlinuxarm.org serves a TLS certificate for another host name, so fetch over
+          # HTTP and rely on the PGP signature below for integrity.
+          base=http://os.archlinuxarm.org/os
           curl -fsSLO $base/ArchLinuxARM-aarch64-latest.tar.gz
           curl -fsSLO $base/ArchLinuxARM-aarch64-latest.tar.gz.sig
           gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys 68B3537F39A313B3E574D06777193F152BDBE6A6
-          gpg --batch --verify ArchLinuxARM-aarch64-latest.tar.gz.sig ArchLinuxARM-aarch64-latest.tar.gz
+          gpg --batch --status-fd 1 --verify ArchLinuxARM-aarch64-latest.tar.gz.sig ArchLinuxARM-aarch64-latest.tar.gz | tee verify.txt
+          grep -q '^\[GNUPG:\] VALIDSIG 68B3537F39A313B3E574D06777193F152BDBE6A6 ' verify.txt
           sudo docker import ArchLinuxARM-aarch64-latest.tar.gz alarm
           rm ArchLinuxARM-aarch64-latest.tar.gz
 
