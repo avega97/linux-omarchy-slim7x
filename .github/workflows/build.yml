@@ -40,10 +40,29 @@ jobs:
           sudo docker import ArchLinuxARM-aarch64-latest.tar.gz alarm
           rm ArchLinuxARM-aarch64-latest.tar.gz
 
+      # Compiler cache: a later run only recompiles what changed. The newest cache of any
+      # variant is reused, since most objects are identical between configurations.
+      - name: Restore ccache
+        uses: actions/cache/restore@v4
+        with:
+          path: ccache
+          key: ccache-${{ inputs.variant }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ inputs.variant }}-
+            ccache-
+
       - name: Build
         run: |
-          mkdir -p out
-          sudo docker run --rm -e CONFIG_VARIANT="${{ inputs.variant }}" -v "$PWD":/work -v "$PWD/out":/out alarm /work/ci/build.sh
+          mkdir -p out ccache
+          sudo docker run --rm -e CONFIG_VARIANT="${{ inputs.variant }}" -v "$PWD":/work -v "$PWD/out":/out -v "$PWD/ccache":/ccache alarm /work/ci/build.sh
+
+      # Save even when the build fails, so a retry does not start from zero.
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ccache
+          key: ccache-${{ inputs.variant }}-${{ github.run_id }}
 
       - name: Checksums
         run: |

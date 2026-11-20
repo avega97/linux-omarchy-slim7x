@@ -20,11 +20,16 @@ retry "${PM[@]}" -Syu --noconfirm --needed --ignore linux-aarch64 --ignore 'linu
 . /work/PKGBUILD
 retry "${PM[@]}" -S --noconfirm --needed "${makedepends[@]}"
 
+retry "${PM[@]}" -S --noconfirm --needed ccache
+
 useradd -m builder
-chown -R builder:builder /work
+chown -R builder:builder /work /ccache
 install -d -o builder -g builder /out
 
 su builder -c 'gpg --batch --import /work/keys/*.asc'
-su builder -c "cd /work && CONFIG_VARIANT='${CONFIG_VARIANT:-full}' MAKEFLAGS=\"-j\$(nproc)\" makepkg -f --noconfirm --nodeps 2>&1 | tee /out/build.log"
+# ccache wraps gcc through its masquerade directory; the kernel tree is always built in the
+# same path, so objects can be reused between runs.
+CC_ENV='export PATH=/usr/lib/ccache/bin:$PATH CCACHE_DIR=/ccache CCACHE_MAXSIZE=3G CCACHE_COMPRESS=1 CCACHE_BASEDIR=/work'
+su builder -c "$CC_ENV; ccache -z >/dev/null; cd /work && CONFIG_VARIANT='${CONFIG_VARIANT:-full}' MAKEFLAGS=\"-j\$(nproc)\" makepkg -f --noconfirm --nodeps 2>&1 | tee /out/build.log; rc=\${PIPESTATUS[0]}; ccache -s | tee /out/ccache-stats.txt; exit \$rc"
 cp /work/*.pkg.tar.zst /out/
 cd /out && sha256sum *.pkg.tar.zst > SHA256SUMS && cat SHA256SUMS
