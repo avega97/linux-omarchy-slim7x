@@ -10,10 +10,12 @@ and a matching DTB (`/usr/lib/modules/<version>/dtb/qcom/x1e80100-lenovo-yoga-sl
 
 ## What is in it
 - Base: kernel.org `linux-7.3.5` (PGP-verified), Omarchy `config.aarch64`.
-- 512 patches from [omacom/omarchy-pkgs](https://github.com/omacom/omarchy-pkgs)
+- 482 patches from [omacom/omarchy-pkgs](https://github.com/omacom/omarchy-pkgs)
   (`pkgbuilds/linux-omarchy-aarch64`), minus those that 7.3.5 already contains, those for Intel/AMD/ROG
-  hardware, the NVIDIA N1x / MediaTek series, and the `mm` opportunistic-compaction series
-  (7.3.5 has its own `reclaim_compact_order`, which overlaps it).
+  hardware, the NVIDIA N1x / MediaTek series, the `mm` opportunistic-compaction series
+  (7.3.5 has its own `reclaim_compact_order`, which overlaps it) and the Glymur (Snapdragon X2) USB4
+  patches that depend on the N1x ones. Dropped patches were found by applying the series on a clean
+  7.3.5 tree and compiling the affected directories.
   Two were rebased by hand: `iris` (power-off IRQ) and `wsa884x` (PA recovery), marked `[omarchy-slim7x: ...]`.
 - 7 patches from aruhier's tree (the last seven entries of `patches/series`): Slim 7x embedded-controller
   node, EC reset GPIO, lid wake on both edges, GPIO 71 documentation, two `qcom-hamoa-ec` driver fixes,
