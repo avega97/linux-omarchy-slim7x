@@ -17,7 +17,7 @@ and a matching DTB (`/usr/lib/modules/<version>/dtb/qcom/x1e80100-lenovo-yoga-sl
   patches that depend on the N1x ones. Dropped patches were found by applying the series on a clean
   7.3.5 tree and compiling the affected directories.
   Two were rebased by hand: `iris` (power-off IRQ) and `wsa884x` (PA recovery), marked `[omarchy-slim7x: ...]`.
-- 7 patches from aruhier's tree (the last seven entries of `patches/series`): Slim 7x embedded-controller
+- 7 patches from aruhier's tree (the last seven entries (plus a one-line export fix, `0520`) of `patches/series`): Slim 7x embedded-controller
   node, EC reset GPIO, lid wake on both edges, GPIO 71 documentation, two `qcom-hamoa-ec` driver fixes,
   NVMe dynamic PCIe link-speed scaling. The EC node, the EC reset GPIO and the SCI-suspend fix are in mainline 7.4-rc1.
 - Config changes: `EC_QCOM_HAMOA=m`, `NVME_SPEED_SWITCH=y`.

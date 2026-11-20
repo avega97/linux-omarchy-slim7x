@@ -487,3 +487,4 @@
 0517-3004-platform--arm64--qcom-hamoa-ec--don-t-fail-probe-on-bad-thermal-capabi.patch
 0518-3005-platform--arm64--qcom-hamoa-ec--Disable-the-SCI-IRQ-during-suspend.patch
 0519-3006-NVMe-dynamic-BW-scale.patch
+0520-3007-PCI-bwctrl-Export-pcie_set_target_speed.patch

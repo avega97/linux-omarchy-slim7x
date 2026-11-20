@@ -1,0 +1,18 @@
+From: Local build fix <noreply@example.invalid>
+Subject: [PATCH] PCI/bwctrl: Export pcie_set_target_speed() for modules
+
+The NVMe speed switch patch (3006) calls pcie_set_target_speed() from
+nvme-core, which is built as a module. Export the symbol so modpost
+does not fail with an undefined symbol.
+
+---
+--- a/drivers/pci/pcie/bwctrl.c
++++ b/drivers/pci/pcie/bwctrl.c
+@@ -156,6 +156,7 @@
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(pcie_set_target_speed);
+ 
+ static void pcie_bwnotif_enable(struct pcie_device *srv)
+ {
