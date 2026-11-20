@@ -12,9 +12,13 @@ PM=(pacman)
 
 pacman-key --init
 pacman-key --populate archlinuxarm
-"${PM[@]}" -Syu --noconfirm --needed base-devel git gnupg
+# The mirrors are sometimes slow enough for pacman to give up on a download.
+retry() { local n; for n in 1 2 3 4; do "$@" && return 0; echo "attempt $n failed" >&2; sleep 20; done; return 1; }
+
+# The container never boots, so its own kernel and firmware are not worth updating.
+retry "${PM[@]}" -Syu --noconfirm --needed --ignore linux-aarch64 --ignore 'linux-firmware*' base-devel git gnupg
 . /work/PKGBUILD
-"${PM[@]}" -S --noconfirm --needed "${makedepends[@]}"
+retry "${PM[@]}" -S --noconfirm --needed "${makedepends[@]}"
 
 useradd -m builder
 chown -R builder:builder /work
