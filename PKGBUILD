@@ -47,6 +47,13 @@ prepare() {
   cp ../config.aarch64 .config
   # Qualcomm embedded controller (fan, thermal, lid) and NVMe link-speed switching
   scripts/config --module EC_QCOM_HAMOA --enable NVME_SPEED_SWITCH
+  # Optional smaller builds: CONFIG_VARIANT=full (default) | aruhier | aruhier-extras
+  case "${CONFIG_VARIANT:-full}" in
+    full) ;;
+    aruhier) cat "$startdir/config-fragments/aruhier-excludes.config" >> .config ;;
+    aruhier-extras) cat "$startdir"/config-fragments/{aruhier,extra}-excludes.config >> .config ;;
+    *) echo "unknown CONFIG_VARIANT=$CONFIG_VARIANT" >&2; return 1 ;;
+  esac
   make olddefconfig
   diff -u ../config.aarch64 .config || :
 

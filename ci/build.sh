@@ -25,6 +25,6 @@ chown -R builder:builder /work
 install -d -o builder -g builder /out
 
 su builder -c 'gpg --batch --import /work/keys/*.asc'
-su builder -c 'cd /work && MAKEFLAGS="-j$(nproc)" makepkg -f --noconfirm --nodeps 2>&1 | tee /out/build.log'
+su builder -c "cd /work && CONFIG_VARIANT='${CONFIG_VARIANT:-full}' MAKEFLAGS=\"-j\$(nproc)\" makepkg -f --noconfirm --nodeps 2>&1 | tee /out/build.log"
 cp /work/*.pkg.tar.zst /out/
 cd /out && sha256sum *.pkg.tar.zst > SHA256SUMS && cat SHA256SUMS
