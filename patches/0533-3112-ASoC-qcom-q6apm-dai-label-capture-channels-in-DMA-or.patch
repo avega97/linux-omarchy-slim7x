@@ -1,0 +1,44 @@
+From 164bc4b34fbb813e45d47371c1c9518e73bbd776 Mon Sep 17 00:00:00 2001
+From: local <local@localhost>
+Date: Sat, 21 Nov 2026 20:19:26 +0100
+Subject: [PATCH] ASoC: qcom: q6apm-dai: label capture channels in DMA order
+
+A capture stream of four channels was remixed by the MFC of its stream
+graph: the codec DMA source labels its channels 1..n, the stream asked
+for FL, FR, LS, RS. Measured on the Yoga Slim 7x V/I feedback capture:
+out0 = in0 + 0.707 in2, out1 = in1 + 0.707 in2, out2 = in3, out3 = 0,
+and the low 16 bits of every word (the current) turned into noise.
+Label capture channels in order so the data passes through unchanged.
+---
+ sound/soc/qcom/qdsp6/q6apm-dai.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/sound/soc/qcom/qdsp6/q6apm-dai.c b/sound/soc/qcom/qdsp6/q6apm-dai.c
+index 881c35e..14e9f05 100644
+--- a/sound/soc/qcom/qdsp6/q6apm-dai.c
++++ b/sound/soc/qcom/qdsp6/q6apm-dai.c
+@@ -237,6 +237,21 @@ static int q6apm_dai_prepare(struct snd_soc_component *component,
+ 	cfg.bit_width = prtd->bits_per_sample;
+ 	cfg.fmt = SND_AUDIOCODEC_PCM;
+ 	audioreach_set_default_channel_mapping(cfg.channel_map, runtime->channels);
++	/*
++	 * A capture stream is fed by a codec DMA source, which labels its
++	 * channels 1..n in order. Use the same labels here, so the MFC of the
++	 * stream passes the channels through. With the playback default for
++	 * four channels (FL, FR, LS, RS) the third DMA channel was taken for a
++	 * centre channel and folded into the first two at -3 dB, the fourth
++	 * landed on the third and the last one was silent: fatal for raw data
++	 * such as the speaker V/I feedback words.
++	 */
++	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
++		int i;
++
++		for (i = 0; i < runtime->channels && i < AR_PCM_MAX_NUM_CHANNEL; i++)
++			cfg.channel_map[i] = i + 1;
++	}
+ 	if (prtd->state) {
+ 		/* clear the previous setup if any  */
+ 		q6apm_graph_stop(prtd->graph);
+-- 
+2.56.0
+

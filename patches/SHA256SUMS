@@ -500,3 +500,4 @@ f3fe240f9eedba57f1398916ac1cfb393d9aa36159752a6f64636b2701c00fe0  0529-3108-ASoC
 fa1f10f799965a4407deeccec7eac96c8c423c0949f9f78bbaa98cc0c848729c  0530-3109-ASoC-qcom-x1e80100-keep-the-stream-rate-for-WSA-V-I.patch
 6a67ca8f0a2826119746c7a4f7424defe4ef19c80eca0ad4c5329ff3ef0d5613  0531-3110-ASoC-qcom-audioreach-module-config-size-is-the-data-.patch
 9e73b5dbc6ab7b34b3722cb851889ad2c0a05e30672388dfff38efaa91dae4b2  0532-3111-slim7x-SP-VI-for-four-speakers-map-by-stream-positio.patch
+b71b60168bed0e92c9bc6ea4f1f93dc9dd098648c84aa55a8ab45dd3062a93a6  0533-3112-ASoC-qcom-q6apm-dai-label-capture-channels-in-DMA-or.patch

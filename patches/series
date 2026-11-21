@@ -500,3 +500,4 @@
 0530-3109-ASoC-qcom-x1e80100-keep-the-stream-rate-for-WSA-V-I.patch
 0531-3110-ASoC-qcom-audioreach-module-config-size-is-the-data-.patch
 0532-3111-slim7x-SP-VI-for-four-speakers-map-by-stream-positio.patch
+0533-3112-ASoC-qcom-q6apm-dai-label-capture-channels-in-DMA-or.patch
