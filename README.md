@@ -1,5 +1,13 @@
 # linux-omarchy-slim7x
 
+> **Branch `audio-speaker-protection`: EXPERIMENTAL.** Same kernel as `main` plus 12 patches (`patches/0521`..`0532`)
+> for WSA884x voltage/current feedback capture and DSP speaker protection on the four Slim 7x speakers:
+> the series of [justririll/x1e-speakers](https://github.com/justririll/x1e-speakers) rebased on 7.3.5, a
+> four-speaker SP VI fix and a "WSA VI Capture" link in the Slim 7x device tree. Compile-tested only, never booted.
+> The package is named `linux-omarchy-slim7x-audio` (modules in `7.3.5-1-omarchy-slim7x-audio`), so it installs
+> next to the `main` kernel and does not replace it. The module parameters `snd_soc_x1e80100.speaker_protection`
+> and `snd_soc_wsa884x.pa_dre_gain` remove volume limits: they default to off, leave them off.
+
 Experimental Arch Linux ARM kernel package for the **Lenovo Yoga Slim 7x** (Snapdragon X Elite),
 built from the Omarchy aarch64 kernel recipe on **linux 7.3.5**, plus the Slim 7x patches from
 [aruhier/linux-slim7x-x1e](https://github.com/aruhier/linux-slim7x-x1e).

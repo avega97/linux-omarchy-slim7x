@@ -1,0 +1,36 @@
+From 65b9f0ef98368a3d048b56ced01c42656ae29ad2 Mon Sep 17 00:00:00 2001
+From: local <local@localhost>
+Date: Sat, 21 Nov 2026 16:26:16 +0100
+Subject: [PATCH 07/12] ASoC: qcom: audioreach: fix speaker protection VI
+
+---
+ sound/soc/qcom/qdsp6/audioreach.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/sound/soc/qcom/qdsp6/audioreach.c b/sound/soc/qcom/qdsp6/audioreach.c
+index 023c7b4..75fc909 100644
+--- a/sound/soc/qcom/qdsp6/audioreach.c
++++ b/sound/soc/qcom/qdsp6/audioreach.c
+@@ -1507,12 +1507,14 @@ static int audioreach_speaker_protection_vi(struct q6apm_graph *graph,
+ 		if (!mcfg->channel_map[i])
+ 			continue;
+ 		/*
+-		 * Map speakers into Vsense and then Isense of each channel.
+-		 * E.g. for PCM_CHANNEL_FL and PCM_CHANNEL_FR to:
+-		 * [1, 2, 3, 4]
++		 * Each 32-bit feedback sample carries Isense in the low and Vsense
++		 * in the high 16 bits (WSA codec DMA V/I feedback), and the module
++		 * reads the halves in memory order. Map them to Isense and then
++		 * Vsense of each speaker, e.g. for PCM_CHANNEL_FL and
++		 * PCM_CHANNEL_FR: [2, 1, 4, 3]
+ 		 */
+-		cm_cfg->cfg.channel_mapping[2 * j] = (mcfg->channel_map[i] - 1) * 2 + 1;
+-		cm_cfg->cfg.channel_mapping[2 * j + 1] = (mcfg->channel_map[i] - 1) * 2 + 2;
++		cm_cfg->cfg.channel_mapping[2 * j] = (mcfg->channel_map[i] - 1) * 2 + 2;
++		cm_cfg->cfg.channel_mapping[2 * j + 1] = (mcfg->channel_map[i] - 1) * 2 + 1;
+ 
+ 		++j;
+ 	}
+-- 
+2.56.0
+

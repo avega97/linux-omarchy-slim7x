@@ -1,0 +1,71 @@
+From c5a31c5ccb6bc26c233661fbf90d39c037ce2042 Mon Sep 17 00:00:00 2001
+From: local <local@localhost>
+Date: Sat, 21 Nov 2026 16:26:16 +0100
+Subject: [PATCH 05/12] ASoC: qcom: topology: fix module config blob handling
+
+---
+ sound/soc/qcom/qdsp6/audioreach.c | 44 +++++++++++++++++++++++++------
+ 1 file changed, 36 insertions(+), 8 deletions(-)
+
+diff --git a/sound/soc/qcom/qdsp6/audioreach.c b/sound/soc/qcom/qdsp6/audioreach.c
+index 4bc04c2..506e48a 100644
+--- a/sound/soc/qcom/qdsp6/audioreach.c
++++ b/sound/soc/qcom/qdsp6/audioreach.c
+@@ -837,18 +837,46 @@ static int audioreach_set_module_config(struct q6apm_graph *graph,
+ 					const struct audioreach_module *module,
+ 					const struct audioreach_module_config *cfg)
+ {
+-	int size = le32_to_cpu(module->data->size);
+-	void *p;
++	int size = le32_to_cpu(module->data->size) - sizeof(*module->data);
++	const u8 *data = (const u8 *)module->data->data;
++	int off = 0, rc;
+ 
+-	struct gpr_pkt *pkt __free(kfree) = audioreach_alloc_apm_cmd_pkt(size, APM_CMD_SET_CFG, 0);
+-	if (IS_ERR(pkt))
+-		return PTR_ERR(pkt);
++	if (size <= 0)
++		return -EINVAL;
+ 
+-	p = (void *)pkt + GPR_HDR_SIZE + APM_CMD_HDR_SIZE;
++	/*
++	 * The blob is a list of APM_CMD_SET_CFG parameters. Send them one by one:
++	 * calibration blobs (e.g. speaker protection) exceed a single GPR packet.
++	 */
++	while (off < size) {
++		const struct apm_module_param_data *param = (const void *)(data + off);
++		int psize;
+ 
+-	memcpy(p, module->data->data, size);
++		if (size - off < APM_MODULE_PARAM_DATA_SIZE)
++			return -EINVAL;
+ 
+-	return q6apm_send_cmd_sync(graph->apm, pkt, 0);
++		psize = APM_MODULE_PARAM_DATA_SIZE + ALIGN(param->param_size, 8);
++		if (psize > size - off)
++			return -EINVAL;
++
++		struct gpr_pkt *pkt __free(kfree) =
++			audioreach_alloc_apm_cmd_pkt(psize, APM_CMD_SET_CFG, 0);
++		if (IS_ERR(pkt))
++			return PTR_ERR(pkt);
++
++		memcpy((void *)pkt + GPR_HDR_SIZE + APM_CMD_HDR_SIZE, param, psize);
++
++		rc = q6apm_send_cmd_sync(graph->apm, pkt, 0);
++		if (rc) {
++			dev_err(graph->dev, "module %#x param %#x: set cfg failed (%d)\n",
++				module->instance_id, param->param_id, rc);
++			return rc;
++		}
++
++		off += psize;
++	}
++
++	return 0;
+ }
+ 
+ static int audioreach_mfc_set_media_format(struct q6apm_graph *graph,
+-- 
+2.56.0
+

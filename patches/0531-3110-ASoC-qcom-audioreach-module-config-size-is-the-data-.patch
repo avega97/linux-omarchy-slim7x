@@ -1,0 +1,27 @@
+From 0d1e1ccb334cdc7122be87b541b7a0379145471d Mon Sep 17 00:00:00 2001
+From: local <local@localhost>
+Date: Sat, 21 Nov 2026 16:26:53 +0100
+Subject: [PATCH 11/12] ASoC: qcom: audioreach: module config size is the data
+ byte count (7.3.5 convention)
+
+---
+ sound/soc/qcom/qdsp6/audioreach.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sound/soc/qcom/qdsp6/audioreach.c b/sound/soc/qcom/qdsp6/audioreach.c
+index 75fc909..4190946 100644
+--- a/sound/soc/qcom/qdsp6/audioreach.c
++++ b/sound/soc/qcom/qdsp6/audioreach.c
+@@ -880,7 +880,8 @@ static int audioreach_set_module_config(struct q6apm_graph *graph,
+ 					const struct audioreach_module *module,
+ 					const struct audioreach_module_config *cfg)
+ {
+-	int size = le32_to_cpu(module->data->size) - sizeof(*module->data);
++	/* 7.3.5: size is the byte count of data[], without the header */
++	int size = le32_to_cpu(module->data->size);
+ 	const u8 *data = (const u8 *)module->data->data;
+ 	int off = 0, rc;
+ 
+-- 
+2.56.0
+

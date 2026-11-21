@@ -2,12 +2,12 @@
 # Based on the linux-omarchy aarch64 recipe (omacom/omarchy-pkgs, pkgbuilds/linux-omarchy-aarch64),
 # rebased on linux 7.3.5 for the Lenovo Yoga Slim 7x (Snapdragon X Elite), with the
 # EC/lid/NVMe patches from aruhier/linux-slim7x-x1e. See README.md.
-pkgbase=linux-omarchy-slim7x
-pkgname=(linux-omarchy-slim7x)
-_kernel=linux-omarchy-slim7x
+pkgbase=linux-omarchy-slim7x-audio
+pkgname=(linux-omarchy-slim7x-audio)
+_kernel=linux-omarchy-slim7x-audio
 pkgver=7.3.5
 pkgrel=1
-pkgdesc='Omarchy aarch64 kernel (BORE, ADIOS) on 7.3.5 for the Lenovo Yoga Slim 7x, with Qualcomm EC support'
+pkgdesc='Omarchy aarch64 kernel on 7.3.5 for the Lenovo Yoga Slim 7x, EXPERIMENTAL speaker V/I feedback and protection patches'
 url='https://github.com/avega97/linux-omarchy-slim7x'
 arch=(aarch64)
 license=(GPL-2.0-only)
@@ -69,7 +69,7 @@ build() {
   make Image modules "${dts[@]/%.dts/.dtb}"
 }
 
-package_linux-omarchy-slim7x() {
+package_linux-omarchy-slim7x-audio() {
   depends=(coreutils initramfs kmod)
   optdepends=(
     'linux-firmware: firmware images needed for some devices'

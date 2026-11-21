@@ -1,0 +1,31 @@
+From fb710be6b5f691e8713c711e16e38c246679f576 Mon Sep 17 00:00:00 2001
+From: local <local@localhost>
+Date: Sat, 21 Nov 2026 16:26:16 +0100
+Subject: [PATCH 10/12] ASoC: qcom: x1e80100: keep the stream rate for WSA V/I
+
+---
+ sound/soc/qcom/x1e80100.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/sound/soc/qcom/x1e80100.c b/sound/soc/qcom/x1e80100.c
+index d44037a..06ca3d8 100644
+--- a/sound/soc/qcom/x1e80100.c
++++ b/sound/soc/qcom/x1e80100.c
+@@ -114,6 +114,14 @@ static int x1e80100_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
+ 	struct snd_interval *channels = hw_param_interval(params,
+ 							  SNDRV_PCM_HW_PARAM_CHANNELS);
+ 
++	switch (cpu_dai->id) {
++	case WSA_CODEC_DMA_TX_0:
++		/* Speaker V/I feedback runs at the rate the protection expects (8 kHz) */
++		return 0;
++	default:
++		break;
++	}
++
+ 	rate->min = rate->max = 48000;
+ 	switch (cpu_dai->id) {
+ 	case TX_CODEC_DMA_TX_0:
+-- 
+2.56.0
+

@@ -1,0 +1,154 @@
+From 92a04aded492c76e74ed36a64b738a93f35848cf Mon Sep 17 00:00:00 2001
+From: local <local@localhost>
+Date: Sat, 21 Nov 2026 16:28:00 +0100
+Subject: [PATCH 12/12] slim7x: SP VI for four speakers (map by stream
+ position) and WSA VI capture link in the device tree
+
+---
+ .../dts/qcom/x1e80100-lenovo-yoga-slim7x.dts  | 51 ++++++++++++++++---
+ sound/soc/qcom/qdsp6/audioreach.c             | 13 +++--
+ 2 files changed, 53 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+index 6a7dca7..5c409fb 100644
+--- a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
++++ b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
+@@ -206,9 +206,9 @@
+ 			};
+ 
+ 			codec {
+-				sound-dai = <&left_woofer>, <&left_tweeter>,
++				sound-dai = <&left_woofer 0>, <&left_tweeter 0>,
+ 					    <&swr0 0>, <&lpass_wsamacro 0>,
+-					    <&right_woofer>, <&right_tweeter>,
++					    <&right_woofer 0>, <&right_tweeter 0>,
+ 					    <&swr3 0>, <&lpass_wsa2macro 0>;
+ 			};
+ 
+@@ -217,6 +217,31 @@
+ 			};
+ 		};
+ 
++		/*
++		 * V/I sense feedback of the four WSA8845 for speaker protection:
++		 * VISENSE ports -> SoundWire master ports 10/11 -> WSA macro AIF_VI.
++		 * UNTESTED: whether WSA_CODEC_DMA_TX_0 also carries the WSA2 macro's
++		 * feedback (right pair) is an assumption, by analogy with playback.
++		 */
++		wsa-vi-dai-link {
++			link-name = "WSA VI Capture";
++
++			cpu {
++				sound-dai = <&q6apmbedai WSA_CODEC_DMA_TX_0>;
++			};
++
++			codec {
++				sound-dai = <&left_woofer 1>, <&left_tweeter 1>,
++					    <&swr0 9>, <&lpass_wsamacro 2>,
++					    <&right_woofer 1>, <&right_tweeter 1>,
++					    <&swr3 9>, <&lpass_wsa2macro 2>;
++			};
++
++			platform {
++				sound-dai = <&q6apm>;
++			};
++		};
++
+ 		va-dai-link {
+ 			link-name = "VA Capture";
+ 
+@@ -1432,12 +1457,19 @@
+ 	pinctrl-0 = <&wsa_swr_active>, <&spkr_01_sd_n_active>;
+ 	pinctrl-names = "default";
+ 
++	/*
++	 * VISENSE (master ports 10/11) is a simple data port on the WSA884x:
++	 * it always uses per-port block packing.
++	 */
++	qcom,ports-block-pack-mode = /bits/ 8 <0x00 0x01 0x01 0x00 0x01 0x01 0x00
++					       0x00 0x00 0x00 0x00 0x00 0x00>;
++
+ 	/* WSA8845, Left Woofer */
+ 	left_woofer: speaker@0,0 {
+ 		compatible = "sdw20217020400";
+ 		reg = <0 0>;
+ 		reset-gpios = <&lpass_tlmm 12 GPIO_ACTIVE_LOW>;
+-		#sound-dai-cells = <0>;
++		#sound-dai-cells = <1>;
+ 		sound-name-prefix = "WooferLeft";
+ 		vdd-1p8-supply = <&vreg_l15b_1p8>;
+ 		vdd-io-supply = <&vreg_l12b_1p2>;
+@@ -1449,7 +1481,7 @@
+ 		compatible = "sdw20217020400";
+ 		reg = <0 1>;
+ 		reset-gpios = <&lpass_tlmm 12 GPIO_ACTIVE_LOW>;
+-		#sound-dai-cells = <0>;
++		#sound-dai-cells = <1>;
+ 		sound-name-prefix = "TweeterLeft";
+ 		vdd-1p8-supply = <&vreg_l15b_1p8>;
+ 		vdd-io-supply = <&vreg_l12b_1p2>;
+@@ -1464,12 +1496,19 @@
+ 	pinctrl-0 = <&wsa2_swr_active>, <&spkr_23_sd_n_active>;
+ 	pinctrl-names = "default";
+ 
++	/*
++	 * VISENSE (master ports 10/11) is a simple data port on the WSA884x:
++	 * it always uses per-port block packing.
++	 */
++	qcom,ports-block-pack-mode = /bits/ 8 <0x00 0x01 0x01 0x00 0x01 0x01 0x00
++					       0x00 0x00 0x00 0x00 0x00 0x00>;
++
+ 	/* WSA8845, Right Woofer */
+ 	right_woofer: speaker@0,0 {
+ 		compatible = "sdw20217020400";
+ 		reg = <0 0>;
+ 		reset-gpios = <&lpass_tlmm 13 GPIO_ACTIVE_LOW>;
+-		#sound-dai-cells = <0>;
++		#sound-dai-cells = <1>;
+ 		sound-name-prefix = "WooferRight";
+ 		vdd-1p8-supply = <&vreg_l15b_1p8>;
+ 		vdd-io-supply = <&vreg_l12b_1p2>;
+@@ -1481,7 +1520,7 @@
+ 		compatible = "sdw20217020400";
+ 		reg = <0 1>;
+ 		reset-gpios = <&lpass_tlmm 13 GPIO_ACTIVE_LOW>;
+-		#sound-dai-cells = <0>;
++		#sound-dai-cells = <1>;
+ 		sound-name-prefix = "TweeterRight";
+ 		vdd-1p8-supply = <&vreg_l15b_1p8>;
+ 		vdd-io-supply = <&vreg_l12b_1p2>;
+diff --git a/sound/soc/qcom/qdsp6/audioreach.c b/sound/soc/qcom/qdsp6/audioreach.c
+index 4190946..c20ea54 100644
+--- a/sound/soc/qcom/qdsp6/audioreach.c
++++ b/sound/soc/qcom/qdsp6/audioreach.c
+@@ -1466,7 +1466,8 @@ static int audioreach_speaker_protection_vi(struct q6apm_graph *graph,
+ 	struct gpr_pkt *pkt;
+ 	void *p;
+ 
+-	if (num_channels > 2) {
++	/* One feedback word per amplifier: up to four speakers (two WSA macros) */
++	if (num_channels < 1 || num_channels > 4) {
+ 		dev_err(graph->dev, "Error: Invalid channels (%d)!\n", num_channels);
+ 		return -EINVAL;
+ 	}
+@@ -1511,11 +1512,13 @@ static int audioreach_speaker_protection_vi(struct q6apm_graph *graph,
+ 		 * Each 32-bit feedback sample carries Isense in the low and Vsense
+ 		 * in the high 16 bits (WSA codec DMA V/I feedback), and the module
+ 		 * reads the halves in memory order. Map them to Isense and then
+-		 * Vsense of each speaker, e.g. for PCM_CHANNEL_FL and
+-		 * PCM_CHANNEL_FR: [2, 1, 4, 3]
++		 * Vsense of each speaker, in the order of the feedback words:
++		 * [2, 1, 4, 3] for two speakers, [2, 1, 4, 3, 6, 5, 8, 7] for four.
++		 * The position in the stream is used, not the channel label: with
++		 * four words the labels (FL, FR, LS, RS) are not consecutive.
+ 		 */
+-		cm_cfg->cfg.channel_mapping[2 * j] = (mcfg->channel_map[i] - 1) * 2 + 2;
+-		cm_cfg->cfg.channel_mapping[2 * j + 1] = (mcfg->channel_map[i] - 1) * 2 + 1;
++		cm_cfg->cfg.channel_mapping[2 * j] = 2 * j + 2;
++		cm_cfg->cfg.channel_mapping[2 * j + 1] = 2 * j + 1;
+ 
+ 		++j;
+ 	}
+-- 
+2.56.0
+

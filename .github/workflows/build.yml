@@ -70,6 +70,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: linux-omarchy-slim7x-${{ inputs.variant || 'full' }}
+          name: linux-omarchy-slim7x-audio-${{ inputs.variant || 'full' }}
           path: out/
           retention-days: 14

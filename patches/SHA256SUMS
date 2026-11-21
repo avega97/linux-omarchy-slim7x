@@ -488,3 +488,15 @@ f62dbac06f4f97953be05e4839fd6bdc0cf4984cc5abdf44659b8b48c5c9037a  0514-3001-arm6
 6e10e9fc39af21a850fc504c7c2ea588e80fb54e80cdea8c3dd5758266f18e71  0518-3005-platform--arm64--qcom-hamoa-ec--Disable-the-SCI-IRQ-during-suspend.patch
 508bdae21bde8557ba636f74bb367f24765005ea4c67bea3bdef08950f32e550  0519-3006-NVMe-dynamic-BW-scale.patch
 7b51029d9f142b966a7ba66a4072dfc371fcdd1456ab3b1eb001a7c6823bc06b  0520-3007-PCI-bwctrl-Export-pcie_set_target_speed.patch
+eb5cab0b818a4bbd4442da2dd4496f7062a9cc59b12fe6eb14b4f5100ef33c80  0521-3100-ASoC-codecs-wsa884x-enable-both-V-and-I-channels-of.patch
+303ee9e19c15c26699ddb4560ca482c2f291a7cca746140774573281ba392405  0522-3101-ASoC-codecs-wsa884x-add-V-I-sense-feedback-capture.patch
+4ccbec19212b89e4a7205be895018401da1ed7faabaffe9a2e2d40f221c3df39  0523-3102-ASoC-qcom-q6apm-dai-allow-S32_LE-capture.patch
+ecef8ef81d84d5ba443a37f61aa398b94ad913476f7d3c5042574e40af8c7228  0524-3103-ASoC-qcom-audioreach-send-topology-module-config-to.patch
+da6961e51e5ca76a4d1bdbcc1814c22ceafc795adc0949fc641bb6af85b70cab  0525-3104-ASoC-qcom-topology-fix-module-config-blob-handling.patch
+1fde0412dadcb6203f5af65c184d423f6c848db53f0f0c09a994739ae2211bbe  0526-3105-ASoC-qcom-audioreach-add-module-control-links.patch
+f7904d6f3c18b7ae0b383b79b582ac679932d970f3a5ac7035b1136888d21320  0527-3106-ASoC-qcom-audioreach-fix-speaker-protection-VI.patch
+73944d0aea0033334bac901ccbcd7bc8f2a03b8b5e29c4396b9075ce2dd8ce52  0528-3107-ASoC-codecs-wsa884x-optional-DRE-controlled-PA-gain.patch
+f3fe240f9eedba57f1398916ac1cfb393d9aa36159752a6f64636b2701c00fe0  0529-3108-ASoC-qcom-x1e80100-allow-skipping-speaker-volume.patch
+fa1f10f799965a4407deeccec7eac96c8c423c0949f9f78bbaa98cc0c848729c  0530-3109-ASoC-qcom-x1e80100-keep-the-stream-rate-for-WSA-V-I.patch
+6a67ca8f0a2826119746c7a4f7424defe4ef19c80eca0ad4c5329ff3ef0d5613  0531-3110-ASoC-qcom-audioreach-module-config-size-is-the-data-.patch
+9e73b5dbc6ab7b34b3722cb851889ad2c0a05e30672388dfff38efaa91dae4b2  0532-3111-slim7x-SP-VI-for-four-speakers-map-by-stream-positio.patch

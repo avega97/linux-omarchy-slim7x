@@ -488,3 +488,15 @@
 0518-3005-platform--arm64--qcom-hamoa-ec--Disable-the-SCI-IRQ-during-suspend.patch
 0519-3006-NVMe-dynamic-BW-scale.patch
 0520-3007-PCI-bwctrl-Export-pcie_set_target_speed.patch
+0521-3100-ASoC-codecs-wsa884x-enable-both-V-and-I-channels-of.patch
+0522-3101-ASoC-codecs-wsa884x-add-V-I-sense-feedback-capture.patch
+0523-3102-ASoC-qcom-q6apm-dai-allow-S32_LE-capture.patch
+0524-3103-ASoC-qcom-audioreach-send-topology-module-config-to.patch
+0525-3104-ASoC-qcom-topology-fix-module-config-blob-handling.patch
+0526-3105-ASoC-qcom-audioreach-add-module-control-links.patch
+0527-3106-ASoC-qcom-audioreach-fix-speaker-protection-VI.patch
+0528-3107-ASoC-codecs-wsa884x-optional-DRE-controlled-PA-gain.patch
+0529-3108-ASoC-qcom-x1e80100-allow-skipping-speaker-volume.patch
+0530-3109-ASoC-qcom-x1e80100-keep-the-stream-rate-for-WSA-V-I.patch
+0531-3110-ASoC-qcom-audioreach-module-config-size-is-the-data-.patch
+0532-3111-slim7x-SP-VI-for-four-speakers-map-by-stream-positio.patch
